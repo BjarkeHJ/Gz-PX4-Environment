@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# export ROS_LOCALHOST_ONLY=1
+
 # --- Paths --- 
 PX4_DIR="$HOME/PX4-Autopilot"
 ENV_DIR="$HOME/Gz-PX4-Environment"

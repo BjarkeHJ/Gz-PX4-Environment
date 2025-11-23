@@ -1,8 +1,0 @@
-# Clock bridge: Gazebo -> ROS2
-- ros_topic_name: "/clock"
-  gz_topic_name: "/world/forest/clock"
-  ros_type_name: "rosgraph_msgs/msg/Clock"
-  gz_type_name: "gz.msgs.Clock"
-  lazy: "False"
-  direction: "GZ_TO_ROS"
-  qos_profile: "CLOCK"

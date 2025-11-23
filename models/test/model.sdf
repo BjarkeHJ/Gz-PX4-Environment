@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sdf version='1.9'>
+  
   <model name='x500_lidar_front'>
     <include merge='true'>
       <uri>x500</uri>
     </include>
+    
     <include merge='true'>
       <uri>model://LW20</uri>
       <pose relative_to="base_link">.15 0 .01 0 0 0</pose>
     </include>
+    
     <joint name="lidar_model_joint" type="fixed">
       <parent>base_link</parent>
       <child>lw20_link</child>
       <pose relative_to="base_link">-0 0 0 0 0 0</pose>
     </joint>
+    
     <link name="lidar_sensor_link">
       <pose relative_to="base_link">0.3 0 0.01 0 0 0</pose>
       <inertial>
@@ -26,11 +30,12 @@
           <iyz>0.0</iyz>
         </inertia>
       </inertial>
+      
       <sensor name='lidar' type='gpu_lidar'>
         <topic>/lidar_front</topic>
-        <gz_frame_id>lidar_sensor_link</gz_frame_id>
+        <gz_frame_id>lidar_sensor_link</gz_frame_id> 
         <pose relative_to="base_link">.15 0 .01 1.57 0 0</pose>
-        <update_rate>50</update_rate>
+        <update_rate>20</update_rate>
         <ray>
           <scan>
             <horizontal>
@@ -55,10 +60,19 @@
         <always_on>1</always_on>
         <visualize>true</visualize>
       </sensor>
+    
+      <noise>
+        <!-- Noise Parameters -->
+        <type>gaussian</type>
+        <mean>0.0</mean>
+        <stddev>0.01</stddev>
+      </noise>
     </link>
+    
     <joint name="lidar_sensor_joint" type="fixed">
       <parent>base_link</parent>
       <child>lidar_sensor_link</child>
     </joint>
+  
   </model>
 </sdf>
