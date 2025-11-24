@@ -2,6 +2,7 @@
 ## Requirements
 - Ubuntu 22.04
 - ROS2 Humble
+- Eigen3
 
 ## Installation
 ### PX4 Autopilot
@@ -58,6 +59,7 @@ If the bridge examples are not working try:
 ```
 sudo apt install ros-humble-ros-gzharmonic
 ```
+
 
 
 
