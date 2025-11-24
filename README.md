@@ -22,7 +22,7 @@ bash ./PX4-Autopilot/Tools/setup/ubuntu.sh
 cd PX4-Autopilot
 
 # Compile the code in SITL mode
-make px4_sitl
+make px4_sitl_default
 ```
 Note: This also installs gazebo modules which are not used but this is the safest way to install the software. 
 
@@ -48,5 +48,6 @@ MicroXRCEAgent udp4 -p 8888
 ```
 
 ### ROS2 Gz bridge
+
 
 
