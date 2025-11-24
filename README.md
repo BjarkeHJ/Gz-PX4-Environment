@@ -54,6 +54,10 @@ The ros_gz_bridge is used for mapping gz topics to ROS2 topics.
 ```
 sudo apt-get install ros-${ROS_DISTRO}-ros-gz
 ```
+If the bridge examples are not working try:
+```
+sudo apt install ros-humble-ros-gzharmonic
+```
 
 
 
