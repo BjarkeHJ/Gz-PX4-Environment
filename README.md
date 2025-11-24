@@ -48,6 +48,11 @@ MicroXRCEAgent udp4 -p 8888
 ```
 
 ### ROS2 Gz bridge
+Based on: https://gazebosim.org/docs/latest/ros_installation/
+The ros_gz_bridge is used for mapping gz topics to ROS2 topics.
+```
+sudo apt-get install ros-${ROS_DISTRO}-ros-gz
+```
 
 
 
