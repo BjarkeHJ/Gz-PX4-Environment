@@ -8,7 +8,7 @@
   qos_profile: "CLOCK"
 
 # LiDAR bridge: Gz -> ROS2
-- ros_topic_name: "/pointcloud"
+- ros_topic_name: "/lidar_front/points_raw"
   gz_topic_name: "/lidar_front/points"
   ros_type_name: "sensor_msgs/msg/PointCloud2"
   gz_type_name: "gz.msgs.PointCloudPacked"
