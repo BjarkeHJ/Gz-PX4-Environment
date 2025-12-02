@@ -32,14 +32,15 @@
       </inertial>
       
       <sensor name='lidar' type='gpu_lidar'>
+        <update_rate>10</update_rate>
         <topic>/lidar_front</topic>
         <gz_frame_id>lidar_sensor_link</gz_frame_id> 
         <!-- <pose relative_to="base_link">.15 0 .01 1.57 0 0</pose> -->
         <pose relative_to="lidar_sensor_link">0 0 0 0 0 0</pose>
-        <update_rate>10</update_rate>
 
         <!-- Lidar Specs -->
-        <ray>
+        <lidar>
+          <!-- FOV -->
           <scan>
             <horizontal>
               <samples>240</samples>
@@ -55,23 +56,23 @@
               <max_angle>0.9250245</max_angle>
             </vertical>
           </scan>
+          <!-- Range -->
           <range>
             <min>0.1</min>
             <max>8.0</max>
             <resolution>0.01</resolution>
           </range>
-        </ray>
+	  
+	  <!-- Noise Parameters -->
+	  <noise type="gaussian">
+	    <mean>0.0</mean>
+	    <stddev>0.01</stddev>
+	  </noise>
+        </lidar>
        
         <always_on>1</always_on>
         <visualize>true</visualize>
-       
-        <!-- Noise Parameters -->
-        <noise type="gaussian">
-          <mean>0.0</mean>
-          <stddev>0.01</stddev>
-        </noise>
       </sensor>
-    
     </link>
     
     <joint name="lidar_sensor_joint" type="fixed">

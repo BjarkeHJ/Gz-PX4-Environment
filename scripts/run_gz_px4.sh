@@ -8,7 +8,7 @@ ENV_DIR_DEFAULT="$(cd -- "${SCRIPT_DIR}/.." >/dev/null 2>&1 && pwd)"
 ENV_DIR="${ENV_DIR:-$ENV_DIR_DEFAULT}" # Allows override via env (not used atm)
 PX4_SIM_PATH="${PX4_DIR}/Tools/simulation/gz"
 
-WORLD_NAME="walls"
+WORLD_NAME="shelf_world"
 PX4_MODEL="x500_lidar"
 HEADLESS=0
 
@@ -135,6 +135,7 @@ PX4_GZ_STANDALONE=1 \
 PX4_SYS_AUTOSTART=4001 \
 PX4_SIM_MODEL="${PX4_MODEL}" \
 PX4_GZ_WORLD="${WORLD_NAME}" \
+UXRCE_DDS_SYNCT=0 \
 ./build/px4_sitl_default/bin/px4
 
 # If PX4 exits normally, still cleanup Gazebo

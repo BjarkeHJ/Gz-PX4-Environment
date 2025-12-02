@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sdf version="1.9">
-    <world name="base"> <!-- CHANGE NAME -->
+    <world name="forklift_world"> <!-- CHANGE NAME -->
         <physics type="ode">
             <max_step_size>0.004</max_step_size>
             <real_time_factor>1.0</real_time_factor>
@@ -273,9 +273,13 @@
             <elevation>0</elevation>
         </spherical_coordinates>
 
+        <!-- BASE END -->
 
-        <!-- BASE END - Include Custom objects under... -->
-
+        <!-- Include Forklift -->
+         <include>
+            <uri>file://objects/forklift/model.sdf</uri>
+            <pose>5 0 0 0 0 0</pose>
+         </include>
 
     </world>
 </sdf>

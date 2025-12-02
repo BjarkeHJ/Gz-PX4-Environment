@@ -1,3 +1,12 @@
+/*
+
+This transform publisher takes the odometry date from PX4 Sitl
+and creates the transform odom -> base_link transform. 
+This transform is thus dynamically updated by reading pose estimation of the simulated IMU-odometry data
+"Transform from where it started to where it think it is..."
+
+*/
+
 #include "tf_pub.hpp"
 
 namespace gz_px4
@@ -44,8 +53,8 @@ void PxOdomToTf::odomCallback(const px4_msgs::msg::VehicleOdometry::SharedPtr ms
     // --- Pack into TF message ---
     geometry_msgs::msg::TransformStamped tf_msg;
     tf_msg.header.stamp = this->get_clock()->now();
-    tf_msg.header.frame_id = "world";      // ENU world
-    tf_msg.child_frame_id  = "base_link";  // FLU body
+    tf_msg.header.frame_id = "odom";      // ENU odom 
+    tf_msg.child_frame_id  = "base_link"; // FLU body
 
     tf_msg.transform.translation.x = enu_pos.x();
     tf_msg.transform.translation.y = enu_pos.y();

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sdf version="1.9">
-    <world name="base"> <!-- CHANGE NAME -->
+    <world name="shelf_world"> <!-- CHANGE NAME -->
         <physics type="ode">
             <max_step_size>0.004</max_step_size>
             <real_time_factor>1.0</real_time_factor>
@@ -273,9 +273,11 @@
             <elevation>0</elevation>
         </spherical_coordinates>
 
-
         <!-- BASE END - Include Custom objects under... -->
-
+        <include>
+            <uri>file://objects/shelf/model.sdf</uri>
+            <pose>15 0 0 0 0 0</pose>
+        </include>
 
     </world>
 </sdf>
