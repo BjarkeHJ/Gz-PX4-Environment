@@ -1,7 +1,7 @@
 """
 ROS 2 Launch File for launching the ros_gz_bridge publishing:
 - Simulation Time @ /clock
-- Lidar Pointcloud @ /pointcloud
+- Lidar Pointcloud @ /lidar_front/points_raw
 """
 
 import os
@@ -19,7 +19,8 @@ def generate_launch_description():
         executable="parameter_bridge",
         name="gz_ros_bridge",
         output="screen",
-        parameters=[{'config_file': config_file}],
+        parameters=[{'config_file': config_file},
+                    {'use_sim_time': True}],
     )
 
     return LaunchDescription([bridge_node])
