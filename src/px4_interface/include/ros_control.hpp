@@ -28,7 +28,6 @@ public:
 
 private:
     rclcpp::TimerBase::SharedPtr timer_;
-
     rclcpp::Publisher<px4_msgs::msg::OffboardControlMode>::SharedPtr offboard_control_mode_pub_;
     rclcpp::Publisher<px4_msgs::msg::TrajectorySetpoint>::SharedPtr trajectory_setpoint_pub_;
     rclcpp::Publisher<px4_msgs::msg::VehicleCommand>::SharedPtr vehicle_command_pub_;
@@ -47,6 +46,7 @@ private:
     float quat_to_float(const geometry_msgs::msg::Quaternion& q);
     float wrap_pi(float a);
 
+    int timer_tick_ms_{50};
     std::deque<Waypoint> plan_;
     rclcpp::Time last_plan_time_;
     bool have_plan_{false};
@@ -60,7 +60,7 @@ private:
     float lookahead_{1.5f};
     float pos_tol_{0.4f};
     float yaw_tol_{5.0f}; // degree
-    float yaw_rate_max_{0.2f}; // rad/s
+    float yaw_rate_max_{0.5f}; // rad/s
     float stale_timeout_{0.5f};
 };
 

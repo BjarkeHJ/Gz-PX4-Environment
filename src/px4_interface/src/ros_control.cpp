@@ -27,7 +27,7 @@ RosControl::RosControl() : Node("ros_control") {
     };
 
     // Maybe change timer to sim-time later (but ok for now - If RTF is increased this timer rate is decreased in practice)
-    timer_ = this->create_wall_timer(std::chrono::milliseconds(50), timer_callback);
+    timer_ = this->create_wall_timer(std::chrono::milliseconds(timer_tick_ms_), timer_callback);
 
     RCLCPP_INFO(this->get_logger(), "Starting Offboard Control node (RosControl)...");
 }
@@ -88,6 +88,7 @@ void RosControl::path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
         plan_.clear();
         return;
     }
+    
     plan_.clear();
     plan_.push_back(Waypoint{p_ref_, yaw_ref_});
 
@@ -102,7 +103,8 @@ void RosControl::path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
 }
 
 void RosControl::update_reference(float dt) {
-    if (!have_plan_ || (this->get_clock()->now() - last_plan_time_).seconds() > stale_timeout_) {
+    // if (!have_plan_ || (this->get_clock()->now() - last_plan_time_).seconds() > stale_timeout_) {
+    if (!have_plan_) {
         // brake to stop smoothly
         Eigen::Vector3f dv = -v_ref_;
         float dv_norm = dv.norm();
@@ -193,7 +195,6 @@ float RosControl::wrap_pi(float a) {
     while (a < -M_1_PI) a += 2.f * M_PI;
     return a;
 }
-
 
 int main(int argc, char *argv[]) {
     rclcpp::init(argc, argv);
