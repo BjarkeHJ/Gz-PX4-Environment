@@ -9,7 +9,7 @@ ENV_DIR="${ENV_DIR:-$ENV_DIR_DEFAULT}" # Allows override via env (not used atm)
 PX4_SIM_PATH="${PX4_DIR}/Tools/simulation/gz"
 
 # WORLD_NAME="shelf_world"
-WORLD_NAME="shelf_world"
+WORLD_NAME="warehouse_world"
 PX4_MODEL="x500_lidar"
 HEADLESS=0
 
@@ -132,12 +132,17 @@ sleep 5
 # --- Start PX4 in Standalone (Will identify the GZ SIM instance)
 cd "${PX4_DIR}"
 echo "[run_gz_px4] Starting PX4 SITL with model: ${PX4_MODEL}"
+
+export PX4_PARAM_EKF2_BARO_CTRL=0
+export PX4_PARAM_EKF2_EV_CTRL=11
+export PX4_PARAM_EKF2_HGT_REF=3
+export PX4_PARAM_EKF2_EV_DELAY=0
+
 PX4_GZ_STANDALONE=1 \
 PX4_SYS_AUTOSTART=4001 \
 PX4_SIM_MODEL="${PX4_MODEL}" \
 PX4_GZ_WORLD="${WORLD_NAME}" \
-UXRCE_DDS_SYNCT=0 \
-./build/px4_sitl_default/bin/px4
+./build/px4_sitl_default/bin/px4 ./build/px4_sitl_default/etc
 
 # If PX4 exits normally, still cleanup Gazebo
 cleanup

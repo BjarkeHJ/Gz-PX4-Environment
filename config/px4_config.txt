@@ -1,0 +1,24 @@
+How to config the GT odometry data feed:
+Navigate to:
+~/PX4-Autopilot/ROMFS/px4mu_common/init.d-posix/airframes/4001_gz_x500
+
+at the bottom of the file copy in the following:
+
+# --- CUSTOMIZE --- 
+param set EKF2_EV_CTRL 11
+param set EKF2_HGT_REF 3
+param set EKF2_BARO_CTRL 0
+param set EKF2_GPS_CTRL 0
+param set EKF2_RNG_CTRL 0
+param set UXRCE_DDS_SYNCT 0
+param set NAV_DLL_ACT 0
+
+In a terminal navigate to:
+~/PX4-Autopilot
+
+and run
+make all 
+
+to enable the changes.
+Now the GT odometry data from gz sim is feed back into the PX4 flight stack and fused with the IMU alone. 
+Thi simulates near-perfect on-board odometry for easier algorithm development (cm precision atleast) 

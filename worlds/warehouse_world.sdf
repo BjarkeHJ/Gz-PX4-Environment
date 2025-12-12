@@ -275,6 +275,10 @@
 
 
         <!-- BASE END - Include Custom objects under... -->
+        <include>
+            <uri>file://objects/warehouse/model.sdf</uri>
+            <pose>0 0 0 0 0 0</pose>
+        </include>
 
     </world>
 </sdf>

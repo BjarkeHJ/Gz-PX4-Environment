@@ -23,7 +23,11 @@ private:
 
     rclcpp::Subscription<px4_msgs::msg::VehicleOdometry>::SharedPtr odom_sub_;
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_gt_sub_;
+    rclcpp::Publisher<px4_msgs::msg::VehicleOdometry>::SharedPtr odom_gt_pub_;
     std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+
+    px4_msgs::msg::VehicleOdometry::SharedPtr last_px4_odom_msg_;
+    rclcpp::Time last_px4_odom_rx_time_;
 };
 
 }
