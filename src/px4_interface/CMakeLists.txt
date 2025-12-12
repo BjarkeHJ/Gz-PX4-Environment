@@ -16,7 +16,7 @@ set(GZ_PX4_BASE_CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../config)
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(geometry_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
 find_package(px4_msgs REQUIRED)
 
 find_package(Eigen3 REQUIRED)
@@ -30,7 +30,7 @@ add_executable(${EXEC_NAME}
 
 ament_target_dependencies(${EXEC_NAME} 
   rclcpp
-  geometry_msgs
+  nav_msgs
   px4_msgs
 )
 
