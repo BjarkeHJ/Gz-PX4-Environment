@@ -55,6 +55,54 @@ AGENT_PID=""
 BRIDGE_PID=""
 TF_PID=""
 
+# Wait for gz world function
+wait_for_gz_world() {
+  local expected_world="$1"
+  local timeout_s="${2:-60}"
+  local start_ts
+  start_ts="$(date +%s)"
+
+  echo "[run_gz_px4] Waiting for Gz Sim world services (timeout: ${timeout_s}s)..."
+
+  while true; do
+    if gz service -l >/dev/null 2>&1; then
+      break
+    fi
+    if (( "$(date +%s)" - start_ts > timeout_s)); then
+      echo "[run_gz_px4] ERROR: Gz Sim transport not responding (gz service -l fails)." >&2
+      return 1
+    fi
+    sleep 0.2
+  done
+  
+  local detected_world=""
+  detected_world="$(gz service -l 2>/dev/null | sed -n 's#^/world/\([^/]\+\).*#\1#p' | head -n1 || true)"
+  if [[ -n "$detected_world" && "$detected_world" != "$expected_world" ]]; then
+    echo "[run_gz_px4] NOTE: Detected world name '${detected_world} (expected '${expected_world}). Using detected..."
+    expected_world="${detected_world}"
+  fi
+
+  while true; do
+    if gz service -l 2>/dev/null | grep -q "^/world/${expected_world}/control$"; then
+      echo "[run_gz_px4] Gz Sim ready: /world/${expected_world}/control is available."
+      return 0
+    fi
+
+    if gz topic -l 2>/dev/null | grep -q "^/world/${expected_world}/clock$"; then
+      echo "[run_gz_px] Gz Sim ready: /world/${expected_world}/clock is available."
+      return 0
+    fi
+
+    if (( "$(date +%s)" - start_ts > timeout_s)); then
+      echo "[run_gz_px4] ERROR: Timed out waiting for world '${expected_world}' readiness". >&2
+      echo "[run_gz_px4] DEBUG: services seen:" >&2
+      gz service -l 2>/dev/null | head -n 80 >&2 || true
+      return 1
+    fi
+    sleep 0.2
+  done
+}
+
 # Clean-up function
 cleanup() {
   echo
@@ -103,7 +151,7 @@ fi
 echo "[run_gz_px4] Starting Gazebo: ${GZ_CMD[*]}"
 setsid "${GZ_CMD[@]}" &
 GZ_PID=$!
-sleep 5
+wait_for_gz_world "${WORLD_NAME}" 90
 
 # --- Start ROS 2 bridge and TF publisher
 echo "[run_gz_px4] Starting ROS 2 bridge..."

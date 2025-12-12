@@ -2,15 +2,21 @@
 #define ROS_CTRL_
 
 #include <chrono>
+#include <queue>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-#include "rclcpp/rclcpp.hpp"
-#include "geometry_msgs/msg/pose_stamped.hpp"
-#include "px4_msgs/msg/offboard_control_mode.hpp"
-#include "px4_msgs/msg/trajectory_setpoint.hpp"
-#include "px4_msgs/msg/vehicle_command.hpp"
-#include "px4_msgs/msg/vehicle_control_mode.hpp"
+#include <rclcpp/rclcpp.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <px4_msgs/msg/offboard_control_mode.hpp>
+#include <px4_msgs/msg/trajectory_setpoint.hpp>
+#include <px4_msgs/msg/vehicle_command.hpp>
+#include <px4_msgs/msg/vehicle_control_mode.hpp>
+
+struct Pose {
+    Eigen::Vector3f pos;
+    float yaw;
+};
 
 class RosControl : public rclcpp::Node 
 {
@@ -38,12 +44,13 @@ private:
     float yaw_enu_to_ned(float yaw_enu);
     float quat_to_float(const geometry_msgs::msg::Quaternion& q);
 
-    float temp_yaw = M_PI_2;
-    const Eigen::Vector3f temp_pos{10.0, 4.0, 5.0};
+    float temp_yaw = 0.0f;
+    const Eigen::Vector3f temp_pos{0.0, 0.0, 5.0};
 
-    std::vector<Eigen::Vector3f> pos_queue;
-    std::vector<float> yaw_queue;
+    std::queue<Eigen::Vector3f> pos_queue;
+    std::queue<float> yaw_queue;
 
+    std::queue<Pose> next_waypoint_interp;
 };
 
 

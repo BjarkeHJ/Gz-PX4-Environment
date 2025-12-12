@@ -10,7 +10,7 @@
                 <pose>0 0 0 0 0 0</pose>
                 <geometry>
                     <mesh>
-                        <scale>1 1 1</scale>
+                        <scale>2 2 2</scale>
                         <uri>meshes/warehouse_colision.stl</uri>
                     </mesh>
                 </geometry>
@@ -19,17 +19,17 @@
                 <pose>0 0 0 0 0 0</pose>
                 <geometry>
                     <mesh>
-                        <scale>1 1 1</scale>
+                        <scale>2 2 2</scale>
                         <uri>meshes/warehouse.dae</uri>
                     </mesh>
                 </geometry>
             </visual>
             <visual name="drop_area_visual">
-                <pose>0 0 0.101 0 0 0</pose>
+                <pose>0 0 0 0 0 0</pose>
                 <!-- x y z R P Y -->
                 <geometry>
                     <mesh>
-                        <scale>1 1 1</scale>
+                        <scale>2 2 2</scale>
                         <uri>meshes/warehouse.dae</uri>
                         <submesh>
                             <name>drop1</name>

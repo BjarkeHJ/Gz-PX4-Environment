@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sdf version="1.9">
-    <world name="base"> <!-- CHANGE NAME -->
+    <world name="warehouse_world"> <!-- CHANGE NAME -->
         <physics type="ode">
             <max_step_size>0.004</max_step_size>
             <real_time_factor>1.0</real_time_factor>
@@ -216,7 +216,7 @@
                         <contact/>
                     </surface>
                 </collision>
-                <visual name="visual">
+                <!-- <visual name="visual">
                     <geometry>
                         <plane>
                             <normal>0 0 1</normal>
@@ -228,7 +228,7 @@
                         <diffuse>0.8 0.8 0.8 1</diffuse>
                         <specular>0.8 0.8 0.8 1</specular>
                     </material>
-                </visual>
+                </visual> -->
                 <pose>0 0 0 0 -0 0</pose>
                 <inertial>
                     <pose>0 0 0 0 -0 0</pose>
@@ -277,7 +277,12 @@
         <!-- BASE END - Include Custom objects under... -->
         <include>
             <uri>file://objects/warehouse/model.sdf</uri>
-            <pose>0 0 0 0 0 0</pose>
+            <pose>0 0 -0.202 0 0 1.57</pose>
+        </include>
+
+        <include>
+            <uri>file://objects/shelf/model.sdf</uri>
+            <pose>15 0 0 0 0 0</pose>
         </include>
 
     </world>
