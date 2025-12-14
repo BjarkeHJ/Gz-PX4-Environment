@@ -3,10 +3,12 @@
 RosControl::RosControl() : Node("ros_control") {
     offboard_control_mode_pub_ = this->create_publisher<px4_msgs::msg::OffboardControlMode>("/fmu/in/offboard_control_mode", 10);
     trajectory_setpoint_pub_ = this->create_publisher<px4_msgs::msg::TrajectorySetpoint>("/fmu/in/trajectory_setpoint", 10);
-    vehicle_command_pub_ = this->create_publisher<px4_msgs::msg::VehicleCommand>("/fmu/in/vehicle_command", 10);
-    waypoint_sub_ = this->create_subscription<nav_msgs::msg::Path>("/waypoints_path", 5, std::bind(&RosControl::path_callback, this, std::placeholders::_1));
-
+    vehicle_command_pub_ = this->create_publisher<px4_msgs::msg::VehicleCommand>("/fmu/in/vehicle_command", 10);    
+    target_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>("/gz_px4_sim/target_pose", 5, std::bind(&RosControl::target_callback, this, std::placeholders::_1));    
     offboard_setpoint_counter_ = 0;
+
+    // TODO: Program so arming starts at first recieved target!
+    // TODO: Progam failsafe if target stream stops (land) VERY OPTIONAL for now
 
     auto timer_callback = [this]() -> void {
         if (offboard_setpoint_counter_ == 10) {
@@ -17,9 +19,7 @@ RosControl::RosControl() : Node("ros_control") {
         }
 
         publish_offboard_control_mode();
-        const float dt = 0.05f; // 50 hz
-        update_reference(dt);
-        publish_trajectory_setpoint(p_ref_, yaw_ref_);
+        publish_trajectory_setpoint(pos_target_, yaw_target_);
 
         if (offboard_setpoint_counter_ < 11) {
             offboard_setpoint_counter_++;
@@ -27,7 +27,7 @@ RosControl::RosControl() : Node("ros_control") {
     };
 
     // Maybe change timer to sim-time later (but ok for now - If RTF is increased this timer rate is decreased in practice)
-    timer_ = this->create_wall_timer(std::chrono::milliseconds(50), timer_callback);
+    timer_ = this->create_wall_timer(std::chrono::milliseconds(timer_tick_ms_), timer_callback);
 
     RCLCPP_INFO(this->get_logger(), "Starting Offboard Control node (RosControl)...");
 }
@@ -79,96 +79,10 @@ void RosControl::publish_vehicle_command(uint16_t command, float param1, float p
     vehicle_command_pub_->publish(msg);
 }
 
-void RosControl::path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
-    last_plan_time_ = this->get_clock()->now();
-
-    if (msg->poses.size() < 1) {
-        RCLCPP_WARN(this->get_logger(), "Received Empty Path - Nothing to do!");
-        have_plan_ = false;
-        plan_.clear();
-        return;
-    }
-    plan_.clear();
-    plan_.push_back(Waypoint{p_ref_, yaw_ref_});
-
-    // Incoming waypoints
-    for (const auto& ps : msg->poses) {
-        Eigen::Vector3f p(ps.pose.position.x, ps.pose.position.y, ps.pose.position.z);
-        float yaw = quat_to_float(ps.pose.orientation);
-        plan_.push_back({p, yaw});
-    }
-
-    have_plan_ = (plan_.size() >= 2 );
-}
-
-void RosControl::update_reference(float dt) {
-    if (!have_plan_ || (this->get_clock()->now() - last_plan_time_).seconds() > stale_timeout_) {
-        // brake to stop smoothly
-        Eigen::Vector3f dv = -v_ref_;
-        float dv_norm = dv.norm();
-        float dv_max = a_max_ * dt;
-        if (dv_norm > dv_max) {
-            dv *= (dv_max / dv_norm);
-        }
-        v_ref_ += dv;
-        p_ref_ += v_ref_ * dt;
-        return;
-    }
-
-    while (plan_.size() >= 2) {
-        Eigen::Vector3f to_wp = plan_[1].p - p_ref_;
-        if (to_wp.norm() < pos_tol_) {
-            plan_.pop_front(); // advance waypoint
-        }
-        else {
-            break;
-        }
-    }
-
-    if (plan_.size() < 2) {
-        RCLCPP_WARN(this->get_logger(), "[Trajectory Generator] Less than 2 waypoints given... Cannot generate trajectory!");
-        have_plan_ = false;
-        return;
-    }
-
-    Eigen::Vector3f target = plan_[1].p;
-    Eigen::Vector3f d = target - p_ref_;
-    float dist = d.norm();
-    Eigen::Vector3f dir = Eigen::Vector3f::Zero();
-    if (dist > 1e-6f) dir = d / dist;
-    
-    float step = std::min(lookahead_, dist);
-    Eigen::Vector3f carrot = p_ref_ + dir * step;
-    
-    Eigen::Vector3f v_des = (carrot - p_ref_);
-    float v_des_norm = v_des.norm();
-    if (v_des_norm > 1e-6f) {
-        v_des = v_des / v_des_norm * std::min(v_max_, v_des_norm / dt); // velocity-ish
-    }
-    else {
-        v_des.setZero();
-    }
-
-    // limit acceleration
-    Eigen::Vector3f dv = v_des - v_ref_;
-    float dv_norm = dv.norm();
-    float dv_max = a_max_ * dt;
-    if (dv_norm > dv_max) {
-        dv *= (dv_max / dv_norm);
-    }
-    v_ref_ += dv;
-    p_ref_ += v_ref_ * dt; // integrate pos;
-    
-    // limit yaw rate
-    float yaw_des = yaw_ref_;
-    if (v_ref_.head<2>().norm() > 0.2f) {
-        yaw_des = std::atan2(v_ref_.y(), v_ref_.x());
-    }
-
-    float dy = wrap_pi(yaw_des - yaw_ref_);
-    float max_dy = yaw_rate_max_ * dt;
-    dy = std::clamp(dy, -max_dy, +max_dy);
-    yaw_ref_ = wrap_pi(yaw_ref_ + dy);
+void RosControl::target_callback(const geometry_msgs::msg::PoseStamped::SharedPtr tgt_msg) {
+    Eigen::Vector3d p_tgt{tgt_msg->pose.position.x, tgt_msg->pose.position.y, tgt_msg->pose.position.z};
+    pos_target_ = p_tgt.cast<float>();
+    yaw_target_ = quat_to_float(tgt_msg->pose.orientation);
 }
 
 void RosControl::pos_enu_to_ned(const Eigen::Vector3f& enu, Eigen::Vector3f& ned) {
@@ -193,7 +107,6 @@ float RosControl::wrap_pi(float a) {
     while (a < -M_1_PI) a += 2.f * M_PI;
     return a;
 }
-
 
 int main(int argc, char *argv[]) {
     rclcpp::init(argc, argv);
